@@ -3,14 +3,14 @@ const wss = new (require("ws")).Server({ server: app });
 
 const configuration = require("./configuration");
 
+const fetch = (...args) => import('node-fetch').then(({ default: get }) => get(...args));
+
 wss.on("connection", (socket) => {
   console.log(`[Server] New socket connected.`);
 
-  socket.send(JSON.stringify(configuration));
-});
+  socket.on("upgrade", (request) => {});
 
-app.on("upgrade", (request, socket, head) => {
-  wss.emit("upgrade", request, socket);
+  socket.send(JSON.stringify(configuration));
 });
 
 app.get("/", (req, res) => {
@@ -19,6 +19,6 @@ app.get("/", (req, res) => {
   res.send("WeeApi");
 });
 
-app.listen(3000);
+app.listen(3000, () => setInterval(() => fetch("https://weeapi.erenix.repl.co"), 15000));
 
 // require("./test-connection");
